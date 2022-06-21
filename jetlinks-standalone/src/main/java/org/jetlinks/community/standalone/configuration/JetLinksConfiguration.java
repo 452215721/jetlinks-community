@@ -19,6 +19,9 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableConfigurationProperties(JetLinksProperties.class)
@@ -76,5 +79,21 @@ public class JetLinksConfiguration {
         return supports;
     }
 
+    /**
+     * 本地运行，解决访问localhost:8848访问localhost:9000的跨域问题
+     *
+     * @return
+     */
+    @Bean
+    CorsWebFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsWebFilter(source);
+    }
 }
